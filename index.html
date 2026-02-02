@@ -67,16 +67,24 @@
       border-left: 4px solid #888;
       position: relative;
       padding-right: 120px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .event-content {
+      flex-grow: 1;
+      padding-right: 40px;
     }
     .event-time {
       position: absolute;
-      right: 10px;
+      right: 60px;
       top: 10px;
       font-size: 12px;
       color: #888;
       font-style: italic;
       text-align: right;
       line-height: 1.3;
+      min-width: 80px;
     }
     .current-event-time {
       position: absolute;
@@ -166,17 +174,12 @@
       display: inline-block;
       width: 45px;
       text-align: left;
-	  font-size: 24px;
+      font-size: 24px;
     }
     #points-chart {
       width: 100% !important;
       height: 280px !important;
       margin-top: 10px;
-    }
-    .chart-title {
-      font-size: 20px;
-      margin-bottom: 8px;
-      color: #ccc;
     }
     .chart-legend {
       display: flex;
@@ -186,7 +189,7 @@
       font-size: 16px;
       position: static;
       bottom: 10px;
-	  margin-bottom: 5px;
+      margin-bottom: 5px;
       left: 0;
       right: 0;
     }
@@ -236,65 +239,96 @@
         gap: 10px;
       }
       .data-controls { justify-content: center; }
+      .event-time {
+        position: static;
+        text-align: left;
+        margin-top: 5px;
+      }
     }
-	
-	/* Стили для диалогового окна */
-	#custom-event-dialog button {
-  padding: 8px 16px;
-  font-size: 14px;
-  margin: 0;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-	}
+    
+    /* Стили для диалогового окна */
+    #custom-event-dialog button {
+      padding: 8px 16px;
+      font-size: 14px;
+      margin: 0;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
 
-	#custom-event-dialog button:hover {
-  opacity: 0.9;
-	}
+    #custom-event-dialog button:hover {
+      opacity: 0.9;
+    }
 
-	/* Подсветка кастомных ивентов в истории */
-.event.custom-event {
-  border-left-color: #4CAF50;
-	}
+    /* Подсветка кастомных ивентов в истории */
+    .event.custom-event {
+      border-left-color: #4CAF50;
+    }
+    
+    /* Стили для кнопки удаления */
+    .delete-event-btn {
+      background: transparent;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 5px 8px;
+      margin-left: 10px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    
+    .delete-event-btn:hover {
+      color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .events-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="header">
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <h1>🃏 КВА 3003</h1>
-    <button id="info-button" title="Сноски и изменения" onclick="toggleInfoPopup()" style="
-      background: transparent;
-      border: 1px solid #555;
-      border-radius: 50%;
-      color: #aaa;
-      font-size: 16px;
-      font-weight: bold;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    ">i</button>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <h1>🃏 КВА 3003</h1>
+      <button id="info-button" title="Сноски и изменения" onclick="toggleInfoPopup()" style="
+        background: transparent;
+        border: 1px solid #555;
+        border-radius: 50%;
+        color: #aaa;
+        font-size: 16px;
+        font-weight: bold;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      ">i</button>
+    </div>
+    
+    <div class="data-controls">
+      <button onclick="DataManager.exportData()" title="Сохранить все данные в файл">💾 Экспорт</button>
+      <label for="file-input" class="file-label" title="Загрузить данные из файла">📁 Импорт</label>
+      <input type="file" id="file-input" accept=".json" onchange="DataManager.importData(event)">
+    </div>
   </div>
-  
-  <div class="data-controls">
-    <button onclick="DataManager.exportData()" title="Сохранить все данные в файл">💾 Экспорт</button>
-    <label for="file-input" class="file-label" title="Загрузить данные из файла">📁 Импорт</label>
-    <input type="file" id="file-input" accept=".json" onchange="DataManager.importData(event)">
-    <button onclick="DataManager.createBackup()" title="Создать резервную копию в браузере">📋 Бэкап</button>
-  </div>
-</div>
 
   <div class="main-controls">
-  <button onclick="toggleCircleArrow()" id="circle-arrow-clicker" title="Кликни для смены направления" style="font-size: 22px;">↻</button>
-  <button onclick="EventManager.rollEvent()">🎲 Новый ивент</button>
-  <button onclick="CustomEventManager.openDialog()">✍️ Свой ивент</button>
-  <button onclick="EventManager.resetGame()">🧼 Сброс ивентов</button>
-  <button onclick="ScoreManager.resetWins()">🔥 Сбросить победы</button>
-</div>
+    <button onclick="toggleCircleArrow()" id="circle-arrow-clicker" title="Кликни для смены направления" style="font-size: 22px;">↻</button>
+    <button onclick="EventManager.rollEvent()">🎲 Новый ивент</button>
+    <button onclick="CustomEventManager.openDialog()">✍️ Свой ивент</button>
+    <button onclick="EventManager.resetGame()">🧼 Сброс ивентов</button>
+    <button onclick="ScoreManager.resetWins()">🔥 Сбросить победы</button>
+  </div>
+  
   <div class="backup-info">
     💡 Сохраняйте файл с данными после каждой игры. Можно загрузить его на другом устройстве чтобы продолжить.
   </div>
@@ -342,22 +376,30 @@
       </div>
     </div>
   </div>
-	<!-- Диалог для создания своего ивента -->
-<div id="custom-event-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-  <div style="background: #222; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #444;">
-    <h3 style="margin-top: 0; color: #fff;">✍️ Создать свой ивент</h3>
-    <div style="margin-bottom: 15px; color: #aaa;">
-      Введите модификатор вручную:
-    </div>
-    <textarea id="custom-event-text" style="width: 100%; height: 120px; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; resize: vertical;" placeholder="Например: Когда выкладывается туз — все игроки — берут 1 карту"></textarea>
-    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-      <button onclick="CustomEventManager.closeDialog()" style="background: #666;">Отмена</button>
-      <button onclick="CustomEventManager.addCustomEvent()" style="background: #4CAF50;">Добавить ивент</button>
+  
+  <!-- Диалог для создания своего ивента -->
+  <div id="custom-event-dialog" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #222; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; border: 2px solid #444;">
+      <h3 style="margin-top: 0; color: #fff;">✍️ Создать свой ивент</h3>
+      <div style="margin-bottom: 15px; color: #aaa;">
+        Введите модификатор вручную:
+      </div>
+      <textarea id="custom-event-text" style="width: 100%; height: 120px; padding: 10px; background: #333; color: white; border: 1px solid #555; border-radius: 5px; font-size: 16px; resize: vertical;" placeholder="Например: Когда выкладывается туз — все игроки — берут 1 карту"></textarea>
+      <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+        <button onclick="CustomEventManager.closeDialog()" style="background: #666;">Отмена</button>
+        <button onclick="CustomEventManager.addCustomEvent()" style="background: #4CAF50;">Добавить ивент</button>
+      </div>
     </div>
   </div>
-</div>
+  
   <div id="result"></div>
-  <div id="events"></div>
+  
+  <div id="events">
+    <div class="events-header">
+      <h3 style="margin: 0;">Прошлые ивенты</h3>
+      <button onclick="EventManager.clearAllEvents()" style="font-size: 14px; padding: 5px 10px;">🗑️ Очистить все</button>
+    </div>
+  </div>
 
 <script>
 // ============ КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ============
@@ -772,20 +814,20 @@ const ScoreManager = {
 // ============ УПРАВЛЕНИЕ ИВЕНТАМИ (EVENT MANAGER) ============
 const EventManager = {
   rollEvent() {
-	const t = Utils.randomChoice(TRIGGERS);
-	const a = Utils.randomChoice(ACTIONS);
-	const e = Utils.randomChoice(EFFECTS);
-	const text = `${t} — ${a} ${e}.`;
-	const timestamp = new Date();
-	const datetime = Utils.formatDateTime(timestamp);
+    const t = Utils.randomChoice(TRIGGERS);
+    const a = Utils.randomChoice(ACTIONS);
+    const e = Utils.randomChoice(EFFECTS);
+    const text = `${t} — ${a} ${e}.`;
+    const timestamp = new Date();
+    const datetime = Utils.formatDateTime(timestamp);
     
-  State.activeEvents.unshift({ 
-    text, 
-    date: datetime.date,
-    time: datetime.time,
-    full: datetime.full,
-    timestamp: timestamp.toISOString() 
-  });
+    State.activeEvents.unshift({ 
+      text, 
+      date: datetime.date,
+      time: datetime.time,
+      full: datetime.full,
+      timestamp: timestamp.toISOString() 
+    });
     
     const eventHTML = `
       <strong>🎲 Активный ивент:</strong><br>${text}
@@ -802,29 +844,67 @@ const EventManager = {
   
   renderEvents() {
     const container = document.getElementById('events');
-    container.innerHTML = '<h3>Прошлые ивенты:</h3>' +
-      State.activeEvents.map(ev => `
-	<div class="event ${ev.custom ? 'custom-event' : ''}">
-		${ev.text}
-    <span class="event-time">
-      ${ev.date}<br>
-      ${ev.time}
-    </span>
-	</div>
-	`).join('');
+    container.innerHTML = `
+      <div class="events-header">
+        <h3 style="margin: 0;">Прошлые ивенты</h3>
+        <button onclick="EventManager.clearAllEvents()" style="font-size: 14px; padding: 5px 10px;">🗑️ Очистить все</button>
+      </div>
+    `;
+    
+    State.activeEvents.forEach((ev, index) => {
+      const eventElement = document.createElement('div');
+      eventElement.className = `event ${ev.custom ? 'custom-event' : ''}`;
+      eventElement.innerHTML = `
+        <div class="event-content">
+          ${ev.text}
+          <span class="event-time">
+            ${ev.date}<br>
+            ${ev.time}
+          </span>
+        </div>
+        <button class="delete-event-btn" onclick="EventManager.deleteEvent(${index})" title="Удалить ивент">🗑️</button>
+      `;
+      container.appendChild(eventElement);
+    });
+    
+    if (State.activeEvents.length === 0) {
+      const emptyMessage = document.createElement('div');
+      emptyMessage.className = 'event';
+      emptyMessage.innerHTML = '<div style="color: #888; text-align: center; width: 100%;">Нет сохранённых ивентов</div>';
+      container.appendChild(emptyMessage);
+    }
+  },
+  
+  deleteEvent(index) {
+    if (confirm("Удалить этот ивент?")) {
+      State.activeEvents.splice(index, 1);
+      this.renderEvents();
+      DataManager.saveAll();
+      Utils.showNotification("Ивент удалён");
+    }
+  },
+  
+  clearAllEvents() {
+    if (confirm("Удалить ВСЕ сохранённые ивенты?")) {
+      State.activeEvents = [];
+      this.renderEvents();
+      DataManager.saveAll();
+      Utils.showNotification("Все ивенты удалены");
+    }
   },
   
   resetGame() {
     if (confirm("Сбросить все ивенты?")) {
       State.activeEvents = [];
       document.getElementById('result').innerHTML = '';
-      document.getElementById('events').innerHTML = '';
+      this.renderEvents();
       localStorage.removeItem(DataManager.STORAGE_KEYS.EVENTS);
       localStorage.removeItem(DataManager.STORAGE_KEYS.CURRENT_EVENT);
       Utils.showNotification("Все ивенты сброшены");
     }
   }
 };
+
 // ============ КАСТОМНЫЕ ИВЕНТЫ (CUSTOM EVENT MANAGER) ============
 const CustomEventManager = {
   openDialog() {
@@ -872,6 +952,7 @@ const CustomEventManager = {
     Utils.showNotification('✅ Ручной ивент добавлен!');
   }
 };
+
 // ============ УПРАВЛЕНИЕ ГРАФИКОМ (CHART MANAGER) ============
 const ChartManager = {
   updateChart() {
@@ -1044,6 +1125,7 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
 let isClockwise = true; // true = ↻, false = ↺
 
 function toggleCircleArrow() {
@@ -1065,7 +1147,7 @@ function toggleCircleArrow() {
     button.style.transform = 'scale(1)';
   }, 100);
 }
-// Добавьте этот код в существующий <script>
+
 function toggleInfoPopup() {
   const popup = document.getElementById('info-popup');
   const button = document.getElementById('info-button');
@@ -1097,6 +1179,7 @@ document.addEventListener('keydown', function(e) {
   }
 });
 </script>
+
 <div id="info-popup" style="
   display: none;
   position: fixed;
